@@ -14,11 +14,11 @@ import {
   TASK_TYPE,
   STATUS_SCHEDULED,
   JOB_OPERATION,
-  CHECK_SENT_MESSAGES_OPERATION,
   OUTBOX,
   WARNING_EMAIL_SUBJECT,
   WARNING_EMAIL_TEXT,
-  WARNING_EMAIL_HTML
+  WARNING_EMAIL_HTML,
+  CHECK_MESSAGES_OPERATION
 } from './constants';
 import {
   EMAIL_FROM,
@@ -67,7 +67,7 @@ export async function createTask(jobUri) {
           mu:uuid ${sparqlEscapeString(taskUuid)} ;
           dct:created ${sparqlEscapeDateTime(now)} ;
           dct:modified ${sparqlEscapeDateTime(now)} ;
-          task:operation ${sparqlEscapeUri(CHECK_SENT_MESSAGES_OPERATION)} ;
+          task:operation ${sparqlEscapeUri(CHECK_MESSAGES_OPERATION)} ;
           task:index ${sparqlEscapeString("0")} ;
           dct:isPartOf ${sparqlEscapeUri(jobUri)} ;
           adms:status ${sparqlEscapeUri(STATUS_SCHEDULED)} .
@@ -104,16 +104,40 @@ export async function updateStatus(uri, status) {
 }
 
 /**
- * Gets the number of berichtencentrum messages sent since the given time
+ * Gets the number of messages sent by ABB since the given time.
+ * That monitors that the sync with Kalliope and Loket are running.
  */
-export async function getNumberOfSentMessagesSince(time) {
+export async function getIncomingMessagesNumberSince(time) {
   const q = `
     ${PREFIXES}
     SELECT DISTINCT ?message
     WHERE {
       GRAPH ?g {
         ?message a schema:Message ;
-          schema:dateSent ?sentDate .
+          schema:dateSent ?sentDate ;
+          schema:sender <http://data.lblod.info/id/bestuurseenheden/141d9d6b-54af-4d17-b313-8d1c30bc3f5b> .
+      }
+      FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))
+    }
+  `;
+
+  const result = await query(q);
+  return result.results.bindings.length;
+}
+
+/**
+ * Gets the number of messages sent by bestuurseenheiden to ABB since the given time.
+ * That monitors that Loket is running.
+ */
+export async function getOutgoingMessagesNumberSince(time) {
+  const q = `
+    ${PREFIXES}
+    SELECT DISTINCT ?message
+    WHERE {
+      GRAPH ?g {
+        ?message a schema:Message ;
+          schema:dateSent ?sentDate ;
+          schema:recipient <http://data.lblod.info/id/bestuurseenheden/141d9d6b-54af-4d17-b313-8d1c30bc3f5b> .
       }
       FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))
     }
