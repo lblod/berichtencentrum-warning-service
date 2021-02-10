@@ -14,11 +14,12 @@ import {
   TASK_TYPE,
   STATUS_SCHEDULED,
   JOB_OPERATION,
-  CHECK_SENT_MESSAGES_OPERATION,
   OUTBOX,
   WARNING_EMAIL_SUBJECT,
   WARNING_EMAIL_TEXT,
-  WARNING_EMAIL_HTML
+  WARNING_EMAIL_HTML,
+  CHECK_MESSAGES_OPERATION,
+  ABB_URI
 } from './constants';
 import {
   EMAIL_FROM,
@@ -67,7 +68,7 @@ export async function createTask(jobUri) {
           mu:uuid ${sparqlEscapeString(taskUuid)} ;
           dct:created ${sparqlEscapeDateTime(now)} ;
           dct:modified ${sparqlEscapeDateTime(now)} ;
-          task:operation ${sparqlEscapeUri(CHECK_SENT_MESSAGES_OPERATION)} ;
+          task:operation ${sparqlEscapeUri(CHECK_MESSAGES_OPERATION)} ;
           task:index ${sparqlEscapeString("0")} ;
           dct:isPartOf ${sparqlEscapeUri(jobUri)} ;
           adms:status ${sparqlEscapeUri(STATUS_SCHEDULED)} .
@@ -104,15 +105,17 @@ export async function updateStatus(uri, status) {
 }
 
 /**
- * Gets the number of berichtencentrum messages sent since the given time
+ * Gets the number of messages sent since the given time.
  */
-export async function getNumberOfSentMessagesSince(time) {
+export async function getNumberOfMessagesSince(time, {sender = undefined, recipient = undefined}) {
   const q = `
     ${PREFIXES}
     SELECT DISTINCT ?message
     WHERE {
       GRAPH ?g {
         ?message a schema:Message ;
+          ${sender ? `schema:sender ${sparqlEscapeUri(sender)} ;` : ''}
+          ${recipient ? `schema:recipient ${sparqlEscapeUri(recipient)} ;` : ''}
           schema:dateSent ?sentDate .
       }
       FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))

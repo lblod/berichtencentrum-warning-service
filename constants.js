@@ -18,7 +18,9 @@ export const CONTAINER_URI_PREFIX = 'http://redpencil.data.gift/id/dataContainer
 
 export const SERVICE_NAME = 'http://lblod.data.gift/services/berichtencentrum-warning-service';
 export const JOB_OPERATION = 'http://lblod.data.gift/id/jobs/concept/JobOperation/berichtencentrumWarning';
-export const CHECK_SENT_MESSAGES_OPERATION = 'http://lblod.data.gift/id/jobs/concept/JobOperation/checkSentMessages';
+export const CHECK_MESSAGES_OPERATION = 'http://lblod.data.gift/id/jobs/concept/JobOperation/checkMessages';
+
+export const ABB_URI = 'http://data.lblod.info/id/bestuurseenheden/141d9d6b-54af-4d17-b313-8d1c30bc3f5b';
 
 export const PREFIXES = `
   PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -42,7 +44,7 @@ export const WARNING_EMAIL_SUBJECT = 'No messages sent in Berichtencentrum';
 export const WARNING_EMAIL_TEXT = `
 Hello,
 
-No messages have been sent through the Berichtencentrum since this morning.
+No activity was detected in the Berichtencentrum since this morning.
 You might want to double check if everything is running properly.
 
 Have a nice day,
@@ -51,7 +53,7 @@ Redpencil.io
 
 export const WARNING_EMAIL_HTML = `
 <p>Hello,</p>
-<p>No messages have been sent through the Berichtencentrum since this morning.</p>
+<p>No activity was detected in the Berichtencentrum since this morning.</p>
 <p>You might want to double check if everything is running properly.</p>
 <p>Have a nice day,</p>
 <p>Redpencil.io</p>
