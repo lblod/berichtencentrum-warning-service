@@ -18,7 +18,8 @@ import {
   WARNING_EMAIL_SUBJECT,
   WARNING_EMAIL_TEXT,
   WARNING_EMAIL_HTML,
-  CHECK_MESSAGES_OPERATION
+  CHECK_MESSAGES_OPERATION,
+  ABB_URI
 } from './constants';
 import {
   EMAIL_FROM,
@@ -104,40 +105,18 @@ export async function updateStatus(uri, status) {
 }
 
 /**
- * Gets the number of messages sent by ABB since the given time.
- * That monitors that the sync with Kalliope and Loket are running.
+ * Gets the number of messages sent since the given time.
  */
-export async function getIncomingMessagesNumberSince(time) {
+export async function getNumberOfMessagesSince(time, {sender = undefined, recipient = undefined}) {
   const q = `
     ${PREFIXES}
     SELECT DISTINCT ?message
     WHERE {
       GRAPH ?g {
         ?message a schema:Message ;
-          schema:dateSent ?sentDate ;
-          schema:sender <http://data.lblod.info/id/bestuurseenheden/141d9d6b-54af-4d17-b313-8d1c30bc3f5b> .
-      }
-      FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))
-    }
-  `;
-
-  const result = await query(q);
-  return result.results.bindings.length;
-}
-
-/**
- * Gets the number of messages sent by bestuurseenheiden to ABB since the given time.
- * That monitors that Loket is running.
- */
-export async function getOutgoingMessagesNumberSince(time) {
-  const q = `
-    ${PREFIXES}
-    SELECT DISTINCT ?message
-    WHERE {
-      GRAPH ?g {
-        ?message a schema:Message ;
-          schema:dateSent ?sentDate ;
-          schema:recipient <http://data.lblod.info/id/bestuurseenheden/141d9d6b-54af-4d17-b313-8d1c30bc3f5b> .
+          ${sender ? `schema:sender ${sparqlEscapeUri(sender)} ;` : ''}
+          ${recipient ? `schema:recipient ${sparqlEscapeUri(recipient)} ;` : ''}
+          schema:dateSent ?sentDate .
       }
       FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))
     }

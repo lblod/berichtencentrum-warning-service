@@ -4,14 +4,14 @@ import { FIRST_CHECK_CRON, SECOND_CHECK_CRON } from './config';
 import {
   STATUS_BUSY,
   STATUS_SUCCESS,
-  STATUS_FAILED
+  STATUS_FAILED,
+  ABB_URI
 } from './constants';
 import {
   createJob,
   createTask,
   updateStatus,
-  getIncomingMessagesNumberSince,
-  getOutgoingMessagesNumberSince,
+  getNumberOfMessagesSince,
   createWarningEmail,
   addError
 } from './queries';
@@ -63,10 +63,13 @@ async function checkSentMessages() {
     await updateStatus(jobUri, STATUS_BUSY);
     await updateStatus(taskUri, STATUS_BUSY);
 
-    const incomingMessagesNumber = await getIncomingMessagesNumber();
-    const outgoingMessagesNumber = await getOutgoingMessagesNumber();
+    const numberOfIncomingMessages = await getNumberOfMessages({sender: ABB_URI});
+    const numberOfOutgoingMessages = await getNumberOfMessages({recipient: ABB_URI});
 
-    if ((incomingMessagesNumber == 0) || (outgoingMessagesNumber == 0)) {
+    console.log(`Processed ${numberOfIncomingMessages} incoming messages today.`);
+    console.log(`Processed ${numberOfOutgoingMessages} outgoing messages today.`);
+
+    if ((numberOfIncomingMessages == 0) || (numberOfOutgoingMessages == 0)) {
       console.log('No incoming or no outgoing messages, creating a warning email.');
       await createWarningEmail(taskUri);
     }
@@ -81,20 +84,11 @@ async function checkSentMessages() {
   }
 }
 
-async function getIncomingMessagesNumber() {
+async function getNumberOfMessages({sender = undefined, recipient = undefined}) {
   const now = new Date();
   const startOfBusinessDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0); // today at 8h
-  const incomingMessagesNumber = await getIncomingMessagesNumberSince(startOfBusinessDay);
-  console.log(`Processed ${incomingMessagesNumber} incoming messages today.`);
-  return incomingMessagesNumber;
-}
-
-async function getOutgoingMessagesNumber() {
-  const now = new Date();
-  const startOfBusinessDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0); // today at 8h
-  const outgoingMessagesNumber = await getOutgoingMessagesNumberSince(startOfBusinessDay);
-  console.log(`Processed ${outgoingMessagesNumber} outgoing messages today.`);
-  return outgoingMessagesNumber;
+  const numberOfMessages = await getNumberOfMessagesSince(startOfBusinessDay, {sender: sender, recipient: recipient});
+  return numberOfMessages;
 }
 
 app.use(errorHandler);
