@@ -44,7 +44,7 @@ export const WARNING_EMAIL_SUBJECT = 'No messages sent in Berichtencentrum';
 export const WARNING_EMAIL_TEXT = `
 Hello,
 
-No activity was detected in the Berichtencentrum since this morning.
+There has been no activity in at least one direction (incoming or outgoing messages) in the Berichtencentrum since this morning.
 You might want to double check if everything is running properly.
 
 Have a nice day,
@@ -53,7 +53,7 @@ Redpencil.io
 
 export const WARNING_EMAIL_HTML = `
 <p>Hello,</p>
-<p>No activity was detected in the Berichtencentrum since this morning.</p>
+<p>There has been no activity in at least one direction (incoming or outgoing messages) in the Berichtencentrum since this morning.</p>
 <p>You might want to double check if everything is running properly.</p>
 <p>Have a nice day,</p>
 <p>Redpencil.io</p>
