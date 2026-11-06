@@ -48,7 +48,7 @@ new CronJob(SECOND_CHECK_CRON, async function() {
 // Internal logic
 
 function checkRequiredEnv() {
-  if (!process.env.EMAIL_FROM || !process.env.EMAIL_TO) {
+  if (!process.env.EMAIL_FROM && !process.env.EMAIL_TO) {
     throw new Error(
       "For this service to work the environment variables EMAIL_FROM and EMAIL_TO should be configured.\n");
   }
