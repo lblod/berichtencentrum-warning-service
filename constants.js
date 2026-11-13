@@ -39,7 +39,7 @@ export const PREFIXES = `
 
 export const OUTBOX = 'http://data.lblod.info/id/mail-folders/2';
 
-export const WARNING_EMAIL_SUBJECT = 'No messages sent in Berichtencentrum';
+export const WARNING_EMAIL_SUBJECT = 'No messages sent in Berichtencentrum in at least one direction';
 
 export const WARNING_EMAIL_TEXT = `
 Hello,
