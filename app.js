@@ -1,5 +1,6 @@
 import { app, errorHandler } from 'mu';
 import { CronJob } from 'cron';
+import { DateTime } from 'luxon';
 import { FIRST_CHECK_CRON, SECOND_CHECK_CRON } from './config';
 import {
   STATUS_BUSY,
@@ -40,7 +41,7 @@ new CronJob(SECOND_CHECK_CRON, async function() {
   try {
     await checkSentMessages();
   } catch (err) {
-    console.log(`An error occurred during first check at ${now}: ${err}`)
+    console.log(`An error occurred during second check at ${now}: ${err}`)
   }
 }, null, true, "Europe/Brussels");
 
@@ -85,8 +86,11 @@ async function checkSentMessages() {
 }
 
 async function getNumberOfMessages({sender = undefined, recipient = undefined}) {
-  const now = new Date();
-  const startOfBusinessDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0); // today at 8h
+  const startOfBusinessDay = DateTime.now()
+    .setZone('Europe/Brussels')
+    .startOf('day')
+    .set({ hour: 8 })
+    .toJSDate(); // today at 8h
   const numberOfMessages = await getNumberOfMessagesSince(startOfBusinessDay, {sender: sender, recipient: recipient});
   return numberOfMessages;
 }
