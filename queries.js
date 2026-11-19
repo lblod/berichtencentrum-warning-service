@@ -118,7 +118,7 @@ export async function getNumberOfMessagesSince(time, {sender = undefined, recipi
           ${recipient ? `schema:recipient ${sparqlEscapeUri(recipient)} ;` : ''}
           schema:dateSent ?sentDate .
       }
-      FILTER (STR(?sentDate) >= STR(${sparqlEscapeDateTime(time)}))
+      FILTER (?sentDate >= ${sparqlEscapeDateTime(time)})
     }
   `;
 
